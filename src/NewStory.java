@@ -25,11 +25,14 @@ public class NewStory {
 	JLabel synopsisLabel = new JLabel("Synopsis");
 	
 	JList list = new JList();
+	private JList genreList;
 	
-	JLabel lblNewLabel = new JLabel("Primary Genre");
+	JLabel genreLabel = new JLabel("Primary Genre");
 	TextArea synopsisTextArea = new TextArea();
 	private JTextField authorTextField;
 	private JButton backButton;
+	Button createStoryButton = new Button("Create Story");
+	JLabel authorLabel = new JLabel("Author");
 	
 	
 
@@ -78,19 +81,19 @@ public class NewStory {
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		DefaultListModel listModel = new DefaultListModel();
 		listModel.addElement("Test 1");
-		list=new JList(listModel);
+		genreList=new JList(listModel);
 		
 		
 		
 		
-		list.setBounds(40, 136, 135, 263);
-		frame.getContentPane().add(list);
+		genreList.setBounds(40, 136, 135, 263);
+		frame.getContentPane().add(genreList);
 		
 
-		lblNewLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(40, 89, 135, 37);
-		frame.getContentPane().add(lblNewLabel);
+		genreLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
+		genreLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		genreLabel.setBounds(40, 89, 135, 37);
+		frame.getContentPane().add(genreLabel);
 		
 
 		synopsisTextArea.setBounds(598, 125, 372, 425);
@@ -98,10 +101,10 @@ public class NewStory {
 		
 
 		synopsisLabel.setBounds(718, 89, 135, 27);
-		lblNewLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
+		genreLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
 		frame.getContentPane().add(synopsisLabel);
 		
-		Button createStoryButton = new Button("Create Story");
+
 		createStoryButton.setFont(new Font("Dialog", Font.BOLD, 16));
 		createStoryButton.setBounds(370, 531, 135, 37);
 		frame.getContentPane().add(createStoryButton);
@@ -111,14 +114,10 @@ public class NewStory {
 		frame.getContentPane().add(authorTextField);
 		authorTextField.setColumns(10);
 		
-		JLabel authorLabel = new JLabel("Author");
+
 		authorLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
 		authorLabel.setBounds(89, 426, 86, 49);
 		frame.getContentPane().add(authorLabel);
-		
-		JButton button = new JButton("New button");
-		button.setBounds(60, 179, 89, 23);
-		frame.getContentPane().add(button);
 		
 		backButton = new JButton("Back");
 		backButton.setBounds(10, 11, 55, 23);
