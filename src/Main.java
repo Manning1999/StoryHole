@@ -1,3 +1,5 @@
+//Description:
+//This class is used for everything 
 
 import java.awt.Button;
 import java.awt.Color;
@@ -46,92 +48,38 @@ public class Main {
 	
 	
 	
-	private String currentStory;
-	DefaultListModel characterListElements = new DefaultListModel();
+	private static String currentStory;
+	public static String _currentStory() {return currentStory;}
+	
+	private static DefaultListModel characterListElements = new DefaultListModel();
 	private ArrayList<Integer> characterIDList = new ArrayList<Integer>();
 	
 
-	private JFrame frame;
-	JPanel panel = new JPanel();
+	private static JFrame frame;
+	public static JFrame _frame() {return frame;}
+	
+	static JPanel panel = new JPanel();
+	public static JPanel _panel() {return panel;}
 
 	
 	
-	//Main Menu Components
-	JScrollPane scrollPane = new JScrollPane();
-	JTextPane descriptionLabel = new JTextPane();
-	JButton newStoryButton = new JButton("New Story");
-	JButton editStoryButton = new JButton("Edit Story");
-	
-	
-	
-	//New story components
-	private JTextField titleTextField;
-	JLabel synopsisLabel = new JLabel("Synopsis");
-	JList list = new JList();
-	private JList genreList;
-	JLabel genreLabel = new JLabel("Primary Genre");
-	TextArea synopsisTextArea = new TextArea();
-	private JTextField authorTextField;
-	private JButton backButton = new JButton("Back");
-	Button createStoryButton = new Button("Create Story");
-	JLabel authorLabel = new JLabel("Author");
-	
-	
-	
-	//Character Menu Components
-	private final JButton characterMenuBackButton = new JButton("Back");
-	private JTextField nameTextField;
-	private JTextField ageTextField;
-	private JTextField raceNationalityTextField;
-	private JTextField genderTextField;
-	JTextPane txtpnYouHaveNot = new JTextPane();
-	JButton newCharacterButton = new JButton("New Character");
-	JPanel characterPanel = new JPanel();
-	JLabel ageLabel = new JLabel("Age:");
-	JButton saveChangesButton = new JButton("Save Changes");
-	JLabel raceNationalityLabel = new JLabel("Race/Nationality:");
-	JTextArea appearanceTextArea = new JTextArea();
-	JLabel appearanceLabel = new JLabel("Appearance");
-	JLabel personalityLabel = new JLabel("Personality");
-	JTextArea personalityTextArea = new JTextArea();
-	JLabel lblGendersex = new JLabel("Gender/Sex:");
-	private final JList friendsList = new JList();
-	private final JButton viewCharacter = new JButton("View");
-	private final JButton removeButton = new JButton("-");
-	private final JButton btnNewButton = new JButton("Add Friend");
-	private JList characterList = new JList();
-	private final JButton button = new JButton("View");
-	private final JButton button_1 = new JButton("-");
-	private final JButton btnAddEnemy = new JButton("Add Enemy");
-	private final JLabel affiliationLabel = new JLabel("Affiliation:");
-	private final JTextField affiliationTextField = new JTextField();
-	
-	
-	
-	//Story Menu components
-	private final JButton storyMenuBackButton = new JButton("Back");
-	JButton charactersButton = new JButton("Characters");
-	JButton chapterPlanningButton = new JButton("Chapter Planning");
-	JButton locationsButton = new JButton("Locations");
-	JButton languagesButton = new JButton("Languages");
-	JLabel planningLabel = new JLabel("PLANNING");
-	JLabel writingLabel = new JLabel("WRITING");
-	JLabel lblNewLabel = new JLabel("Title");
 
+	static JScrollPane scrollPane = new JScrollPane();
+	static JTextPane descriptionLabel = new JTextPane();
+	static JButton newStoryButton = new JButton("New Story");
+	static JButton editStoryButton = new JButton("Edit Story");
+	
+
+	 static Connection connection = null;
+     static java.sql.Statement statement = null;
+	
+	static ResultSet resultSet = null;
 	
 	
 	
-	
-	 Connection connection = null;
-     java.sql.Statement statement = null;
-	
-	ResultSet resultSet = null;
-	
-	
-	
-	Boolean mainMenuIsCreated = false;
-	Boolean createdNewStoryMenu = false;
-	Boolean characterMenuIsCreated = false;
+	static Boolean mainMenuIsCreated = false;
+
+
 	Boolean storyMenuIsCreated = false;
 
 	/**
@@ -174,13 +122,56 @@ public class Main {
 		
 		SetMainMenu(true);
 		
-		
+
 		LoadStoriesFromDatabase();
+
+		scrollPane.setBounds(10, 86, 291, 498);
+		frame.getContentPane().add(scrollPane);
+		
+		
+		scrollPane.setViewportView(panel);
+		panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 5));
+		panel.setBackground(new Color(211,211,211));
+		panel.setLayout(null);
+
+		newStoryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					NewStory.SetNewStoryMenu(true);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		
+		newStoryButton.setBounds(10, 25, 291, 50);
+		frame.getContentPane().add(newStoryButton);
+
+		editStoryButton.setBounds(633, 542, 145, 50);
+		frame.getContentPane().add(editStoryButton);
+		editStoryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					StoryMenu.SetStoryMenu(true);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		descriptionLabel.setBounds(413, 92, 571, 439);
+		frame.getContentPane().add(descriptionLabel);
+		
+		
 	}
 	
 	
 	
-	private void SetMainMenu(Boolean set) throws SQLException {
+	
+	public static void SetMainMenu(Boolean set) throws SQLException {
 		
 		
 		if(mainMenuIsCreated == false) {
@@ -200,7 +191,7 @@ public class Main {
 			newStoryButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
-						SetNewStoryMenu(true);
+						NewStory.SetNewStoryMenu(true);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -217,7 +208,7 @@ public class Main {
 			editStoryButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
-						SetStoryMenu(true);
+						StoryMenu.SetStoryMenu(true);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -245,9 +236,9 @@ public class Main {
 			else {
 				
 				if(set==true) {
-					SetNewStoryMenu(false);
-					SetCharacterMenu(false);
-					SetStoryMenu(false);
+					NewStory.SetNewStoryMenu(false);
+					CharacterPlanningMenu.SetCharacterMenu(false);
+					StoryMenu.SetStoryMenu(false);
 					LoadStoriesFromDatabase();
 				}
 				
@@ -263,513 +254,17 @@ public class Main {
 	
 	
 	
-	private void SetNewStoryMenu(Boolean set) throws SQLException {
-		
-		if(createdNewStoryMenu == false && set == true) {
-			
-			SetMainMenu(false);
-			createdNewStoryMenu = true;
-			
-			titleTextField = new JTextField();
-			titleTextField.setFont(new Font("Tahoma", Font.BOLD, 29));
-			titleTextField.setHorizontalAlignment(SwingConstants.CENTER);
-			titleTextField.setText("Title");
-			titleTextField.setToolTipText("Title");
-			titleTextField.setBounds(356, 29, 262, 56);
-			frame.getContentPane().add(titleTextField);
-			titleTextField.setColumns(10);
-			
-			
-			list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-			DefaultListModel listModel = new DefaultListModel();
-			listModel.addElement("Test 1");
-			genreList=new JList(listModel);
-			
-			genreList.setBounds(40, 136, 135, 263);
-			frame.getContentPane().add(genreList);
-			
-
-			genreLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
-			genreLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			genreLabel.setBounds(40, 89, 135, 37);
-			frame.getContentPane().add(genreLabel);
-			
-
-			synopsisTextArea.setBounds(598, 125, 372, 425);
-			frame.getContentPane().add(synopsisTextArea);
-			
-
-			synopsisLabel.setBounds(718, 89, 135, 27);
-			genreLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
-			frame.getContentPane().add(synopsisLabel);
-			
-
-
-			createStoryButton.setFont(new Font("Dialog", Font.BOLD, 16));
-			createStoryButton.setBounds(370, 531, 135, 37);
-			createStoryButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					
-		            Date date = new Date();
-		            
-					System.out.println("INSERT  INTO Story VALUES(" + CountRowsInTable("Story") + 1 + ",'" + titleTextField.getText() + "','" + authorTextField.getText() + "'," + date + ",'" + synopsisTextArea.getText() + "')");
-					
-					
-					ExecuteSQLStatement("INSERT  INTO Story VALUES(" + CountRowsInTable("Story") + 1 + ",'" + titleTextField.getText() + "','" + authorTextField.getText() + "','" + date + "','" + synopsisTextArea.getText() + "')");
-				}
-			});
-			frame.getContentPane().add(createStoryButton);
-			
-			
-
-			authorTextField = new JTextField();
-			authorTextField.setBounds(40, 473, 172, 37);
-			frame.getContentPane().add(authorTextField);
-			authorTextField.setColumns(10);
-			
-
-			authorLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
-			authorLabel.setBounds(89, 426, 86, 49);
-			frame.getContentPane().add(authorLabel);
-			
-			
-			
-			backButton.setBounds(10, 11, 89, 23);
-			backButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					try {
-						SetMainMenu(true);
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-			});
-			frame.getContentPane().add(backButton);
-		}
-		else {
-			
-			if(set == true) {
-				SetMainMenu(false);
-			}
-			
-			
-			if(createdNewStoryMenu == true) {
-				titleTextField.setVisible(set);
-				backButton.setVisible(set);
-				authorLabel.setVisible(set);
-				authorTextField.setVisible(set);
-				createStoryButton.setVisible(set);
-				synopsisLabel.setVisible(set);
-				synopsisTextArea.setVisible(set);
-				genreLabel.setVisible(set);
-				genreList.setVisible(set);
-			}
-		}
-		
-	}
-	
-	
-	private void SetStoryMenu(Boolean set) throws SQLException {
-		
-		if(set == true) {
-			SetCharacterMenu(false);
-			SetMainMenu(false);
-		}
-		
-		if(storyMenuIsCreated == true) {
-			
-			charactersButton.setVisible(set);
-			chapterPlanningButton.setVisible(set);
-			languagesButton.setVisible(set);
-			locationsButton.setVisible(set);
-			languagesButton.setVisible(set);
-			planningLabel.setVisible(set);
-			writingLabel.setVisible(set);
-			lblNewLabel.setVisible(set);
-			storyMenuBackButton.setVisible(set);
-		}
-		else {
-			
-			if(set == true) {
-				storyMenuIsCreated = true;
-	
-				charactersButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						try {
-							SetCharacterMenu(true);
-							
-						} catch (SQLException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-				});
-				
-				
-				storyMenuBackButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-					}
-				});
-				storyMenuBackButton.setBounds(10, 20, 89, 23);
-				
-				frame.getContentPane().add(storyMenuBackButton);
-				storyMenuBackButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						try {
-							SetMainMenu(true);
-						} catch (SQLException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-				});
-	
-				charactersButton.setBounds(135, 267, 175, 64);
-				frame.getContentPane().add(charactersButton);
-				
-	
-				chapterPlanningButton.setBounds(676, 333, 175, 64);
-				frame.getContentPane().add(chapterPlanningButton);
-				
-	
-				locationsButton.setBounds(135, 501, 175, 64);
-				frame.getContentPane().add(locationsButton);
-				
-	
-				languagesButton.setBounds(135, 384, 175, 64);
-				frame.getContentPane().add(languagesButton);
-				
-	
-				planningLabel.setFont(new Font("Tahoma", Font.BOLD, 41));
-				planningLabel.setBounds(119, 131, 232, 106);
-				frame.getContentPane().add(planningLabel);
-				
-	
-				writingLabel.setFont(new Font("Tahoma", Font.BOLD, 41));
-				writingLabel.setBounds(656, 131, 232, 106);
-				frame.getContentPane().add(writingLabel);
-				
-	
-				lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 40));
-				lblNewLabel.setBounds(341, 11, 346, 99);
-				frame.getContentPane().add(lblNewLabel);
-			}
-		}
-		
-		
-		
-	}
-	
-	private void SetCharacterMenu(Boolean set) throws SQLException {
-		
-		
-			System.out.println(characterMenuIsCreated);
-		
-			if(characterMenuIsCreated == true) {
-				
-				nameTextField.setVisible(set);
-				txtpnYouHaveNot.setVisible(set);
-				characterList.setVisible(set);
-				newCharacterButton.setVisible(set);
-				ageTextField.setVisible(set);
-				raceNationalityTextField.setVisible(set);
-				appearanceTextArea.setVisible(set);
-				genderTextField.setVisible(set);
-				characterList.clearSelection();
-				characterPanel.setVisible(set);
-				ageLabel.setVisible(set);
-				appearanceLabel.setVisible(set);
-				personalityLabel.setVisible(set);
-				removeButton.setVisible(set);
-				affiliationTextField.setVisible(set);
-				affiliationLabel.setVisible(set);
-				characterMenuBackButton.setVisible(set);
-				ShowCharacterList();
-				
-				if(set == true) {
-					SetStoryMenu(false);
-				}
-				else {
-					txtpnYouHaveNot.setVisible(false);
-				}
-				
-				
-			}
-			else {
-			
-				if(set == true) {
-					
-					SetStoryMenu(false);
-					
-					characterMenuIsCreated = true;
-					
-					if(CountRowsInTableWithConditions("Character", "Story", "(SELECT ID FROM Story WHERE Title = '" + currentStory + "')") == 0) {
-						txtpnYouHaveNot.setBackground(SystemColor.controlShadow);
-						txtpnYouHaveNot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 14));
-						txtpnYouHaveNot.setText("You have not created any characters yet");
-						txtpnYouHaveNot.setBounds(17, 141, 195, 70);
-						frame.getContentPane().add(txtpnYouHaveNot);
-					}
-
-					
-					characterList = new JList(ShowCharacterList());
-					characterList.addListSelectionListener(new ListSelectionListener() {
-						public void valueChanged(ListSelectionEvent e) {
-							ShowCharacterDetails(characterList.getSelectedIndex());
-						}
-					});
-					
-					
-					
-					
-					characterMenuBackButton.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							try {
-								SetStoryMenu(true);
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}
-					});
-					characterMenuBackButton.setBounds(10, 20, 89, 23);
-					
-					frame.getContentPane().add(characterMenuBackButton);
-					characterMenuBackButton.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							try {
-								SetMainMenu(true);
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}
-					});
-					
-					
-					characterList.setBackground(SystemColor.activeCaptionBorder);
-					characterList.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, SystemColor.controlShadow, SystemColor.activeCaptionBorder));
-					characterList.setBounds(10, 128, 206, 456);
-					frame.getContentPane().add(characterList);
-					
-					
-					
-					newCharacterButton.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							nameTextField.setText("Name");
-							ageTextField.setText("");
-							raceNationalityTextField.setText("");
-							appearanceTextArea.setText("");
-							genderTextField.setText("");
-							characterList.clearSelection();
-							affiliationTextField.setText("");
-						}
-					});
-					
-			
-					
-					newCharacterButton.setBounds(10, 67, 206, 50);
-					frame.getContentPane().add(newCharacterButton);
-					
-			
-					characterPanel.setBackground(SystemColor.activeCaptionBorder);
-					characterPanel.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(180, 180, 180), null, null, new Color(200, 200, 200)));
-					characterPanel.setForeground(SystemColor.scrollbar);
-					characterPanel.setBounds(236, 67, 761, 484);
-					frame.getContentPane().add(characterPanel);
-					characterPanel.setLayout(null);
-					saveChangesButton.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-								
-							
-								if(characterList.getSelectedIndex() == -1) {
-									ExecuteSQLStatement("INSERT INTO Character(ID, CharacterName, Age, RaceOrNationality, DOB, Appearance, Personality, Story, Gender, Affiliation) VALUES(" + (CountRowsInTable("Character") + 1) + ",'" + nameTextField.getText() + "','" + ageTextField.getText() + "','" + raceNationalityTextField.getText() + "','DOB','" + appearanceTextArea.getText() + "','" + personalityTextArea.getText() + "', (SELECT ID FROM Story WHERE Title = '" + currentStory + "'),'"+ genderTextField.getText() + "','" + affiliationTextField.getText() +"')");
-								}
-								else {
-									ExecuteSQLStatement("UPDATE Character SET CharacterName = '" + nameTextField.getText() + "', Age = '" + ageTextField.getText() + "', RaceOrNationality = '" + raceNationalityTextField.getText() + "', DOB = 'DOB', Appearance = '" + appearanceTextArea.getText() + "', Personality = '" + personalityTextArea.getText() + "', Gender = '"+ genderTextField.getText() + "', Affiliation = '" + affiliationTextField.getText() +"' WHERE ID = " + characterIDList.get(characterList.getSelectedIndex()));
-								}
-								
-								try {
-									ShowCharacterList();
-								} catch (SQLException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-						
-						}
-					});
-					
-			
-					saveChangesButton.setBounds(321, 450, 101, 23);
-					characterPanel.add(saveChangesButton);
-					
-					
-					nameTextField = new JTextField();
-					nameTextField.setHorizontalAlignment(SwingConstants.CENTER);
-					nameTextField.setText("Name");
-					nameTextField.setBounds(250, 11, 228, 40);
-					characterPanel.add(nameTextField);
-					nameTextField.setColumns(10);
-					
-					
-					ageTextField = new JTextField();
-					ageTextField.setBounds(178, 77, 86, 20);
-					characterPanel.add(ageTextField);
-					ageTextField.setColumns(10);
-					
-			
-					ageLabel.setBounds(150, 80, 31, 14);
-					characterPanel.add(ageLabel);
-					
-			
-					raceNationalityLabel.setBounds(82, 124, 126, 14);
-					characterPanel.add(raceNationalityLabel);
-					
-					raceNationalityTextField = new JTextField();
-					raceNationalityTextField.setColumns(10);
-					raceNationalityTextField.setBounds(178, 121, 86, 20);
-					characterPanel.add(raceNationalityTextField);
-					
-			
-					appearanceTextArea.setBounds(10, 199, 176, 156);
-					characterPanel.add(appearanceTextArea);
-					
-			
-					appearanceLabel.setBounds(69, 178, 66, 14);
-					characterPanel.add(appearanceLabel);
-					
-			
-					personalityLabel.setBounds(280, 178, 66, 14);
-					characterPanel.add(personalityLabel);
-					
-			
-					personalityTextArea.setBounds(221, 199, 176, 156);
-					characterPanel.add(personalityTextArea);
-					
-			
-					lblGendersex.setBounds(382, 80, 83, 14);
-					characterPanel.add(lblGendersex);
-					
-					genderTextField = new JTextField();
-					genderTextField.setColumns(10);
-					genderTextField.setBounds(454, 80, 86, 20);
-					characterPanel.add(genderTextField);
-					friendsList.setBounds(474, 203, 113, 156);
-					
-					characterPanel.add(friendsList);
-					viewCharacter.setFont(new Font("Tahoma", Font.PLAIN, 11));
-					viewCharacter.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-						}
-					});
-					viewCharacter.setBounds(474, 360, 66, 23);
-					
-					characterPanel.add(viewCharacter);
-					removeButton.setFont(new Font("Tahoma", Font.BOLD, 22));
-					removeButton.setBounds(539, 360, 48, 23);
-					
-					characterPanel.add(removeButton);
-					btnNewButton.setBounds(474, 178, 113, 23);
-					
-					characterPanel.add(btnNewButton);
-					list.setBounds(613, 203, 113, 156);
-					
-					characterPanel.add(list);
-					button.setFont(new Font("Tahoma", Font.PLAIN, 11));
-					button.setBounds(613, 360, 66, 23);
-					
-					characterPanel.add(button);
-					button_1.setFont(new Font("Tahoma", Font.BOLD, 22));
-					button_1.setBounds(678, 360, 48, 23);
-					
-					characterPanel.add(button_1);
-					btnAddEnemy.setBounds(613, 178, 113, 23);
-					
-					characterPanel.add(btnAddEnemy);
-					affiliationLabel.setBounds(397, 127, 56, 14);
-					
-					characterPanel.add(affiliationLabel);
-					affiliationTextField.setColumns(10);
-					affiliationTextField.setBounds(454, 121, 86, 20);
-					
-					characterPanel.add(affiliationTextField);
-				}
-			}
-		}
-			
-		
-		
 	
 	
 	
 	
-	private DefaultListModel ShowCharacterList() throws SQLException {
-		
-		
-		if(CountRowsInTableWithConditions("Character", "Story", "(SELECT ID FROM Story WHERE Title = '" + currentStory + "')") == 0) {
-			txtpnYouHaveNot.setVisible(true);
-		}
-		else {
-			txtpnYouHaveNot.setVisible(false);
-		}
-		
-		ResultSet rs = null;
-
-		try {
-			
-			
-			characterListElements.removeAllElements();
-			
-			 String msAccDB = "C:/Users/manni/eclipse-workspace/StoryPlanner" + "/StoryPlanner.accdb";
-	         String dbURL = "jdbc:ucanaccess://" + msAccDB; 
-	         
-			
-			// Step 2.A: Create and 
-	        // get connection using DriverManager class
-	        connection = DriverManager.getConnection(dbURL); 
 	
-	        // Step 2.B: Creating JDBC Statement 
-	        statement = connection.createStatement();
 	
-	        // Step 2.C: Executing SQL and 
-	        // retrieve data into ResultSet
-	        
-	      rs = statement.executeQuery("SELECT * FROM Character WHERE Story = (SELECT ID FROM Story WHERE Title = '" + currentStory + "')");
-	      
-	      
-	      characterIDList.clear();
-	      
-	      while(rs.next()) {
-	    	  characterIDList.add(rs.getInt(1));
-	    	  characterListElements.addElement(rs.getString(2));
-	    	  System.out.println("SELECT * FROM Character WHERE Story = (SELECT ID FROM Story WHERE Title = " + currentStory + ")          Result: " + rs.getString(2));
-	      }
-	      
-		}catch(Exception e){
-			System.out.println(e);
-		}
-				
-		
-		return characterListElements;
-		
-		
-	}
+	//This updates the character information screen to display the relavent information for whatever character is selected in the Character editing menu
 	
-	private void ShowCharacterDetails(int key) {
-		
-		System.out.println(key + 1);
-		key += 1;
-		nameTextField.setText(SearchDatabase("CharacterName", "Character", Integer.toString(key), "ID"));
-		ageTextField.setText(SearchDatabase("Age", "Character", Integer.toString(key), "ID"));
-		raceNationalityTextField.setText(SearchDatabase("RaceOrNationality", "Character", Integer.toString(key), "ID"));
-		appearanceTextArea.setText(SearchDatabase("Appearance", "Character", Integer.toString(key), "ID"));
-		genderTextField.setText(SearchDatabase("Gender", "Character", Integer.toString(key), "ID"));
-		personalityTextArea.setText(SearchDatabase("Personality", "Character", Integer.toString(key), "ID"));
-		
-	}
 	
-	private int CountRowsInTableWithConditions(String table, String field, String condition) {
+	//Counts the number of rows in a table that fit a given condition
+	public static int CountRowsInTableWithConditions(String table, String field, String condition) {
 		
 		int result = 0;
 		ResultSet rs;
@@ -814,7 +309,8 @@ public class Main {
 		return result;
 	}
 	
-	private void ExecuteSQLStatement(String newStatement) {
+	//A generic function that will perform any SQL statetement it is given but does nto return any values
+	public static void ExecuteSQLStatement(String newStatement) {
 		
 			
 			try {
@@ -850,7 +346,8 @@ public class Main {
 		       
 	}
 	
-	private int CountRowsInTable(String table) {
+	//Counts the number of rows in a table without any conditions
+	public static int CountRowsInTable(String table) {
 		
 		int result = 0;
 		ResultSet rs;
@@ -894,8 +391,8 @@ public class Main {
 	
 	
 	
-	//Shows the description on the main menu
-	private void ShowDescription(int key) {
+	//Shows the description of the selected story on the main menu
+	public static void ShowDescription(int key) {
 		
 		System.out.println("Showing description for " + key);
 		
@@ -918,7 +415,7 @@ public class Main {
 	}
 	
 	
-	private void LoadStoriesFromDatabase() {
+	private static void LoadStoriesFromDatabase() {
 		
 		 // variables
        
@@ -1018,7 +515,8 @@ public class Main {
 	}
 	
 	
-	private String SearchDatabase(String fieldToRetrieve, String table, String valueToCompare, String fieldToCompare) {
+	//Searches for a field in the specified table that matches a the given paramaters
+	public static String SearchDatabase(String fieldToRetrieve, String table, String valueToCompare, String fieldToCompare) {
 
 		
 		
@@ -1067,8 +565,15 @@ public class Main {
 		return value;
 		
 	}
+	
+	
+	
+	
+	
 
 	
+
+
 	private void ShowCategories() {
 		
 	}
