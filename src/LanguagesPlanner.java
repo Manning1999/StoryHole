@@ -527,6 +527,9 @@ public class LanguagesPlanner {
 		ShowLanguageList();
 	}
 	
+	
+	
+	
 	private void SaveWordDetails() {
 		//Determine whether a new word is being created or a word is being update
 		if(wordList.getSelectedIndex() != -1) {

@@ -66,10 +66,13 @@ public class CharacterPlanningMenu extends Object{
 	
 	
 	
+	
 	private static ArrayList<Integer> characterIDList = new ArrayList<Integer>();
 
 	
 	static Boolean characterMenuIsCreated = false;
+	private Boolean isAddingFriend = false;
+	private Boolean isAddingEnemy = false;
 	
 
 	/**
@@ -135,6 +138,9 @@ public class CharacterPlanningMenu extends Object{
 		
 		newCharacterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				isAddingEnemy = false;
+				isAddingFriend = false;
+				
 				nameTextField.setText("Name");
 				ageTextField.setText("");
 				raceNationalityTextField.setText("");

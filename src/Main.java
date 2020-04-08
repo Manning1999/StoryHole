@@ -1,5 +1,5 @@
 //Description:
-//This class is used for everything 
+//This class is for the main menu as well as all common functions and variables
 
 import java.awt.Button;
 import java.awt.Color;
@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.SystemColor;
 import java.awt.TextArea;
 
@@ -16,7 +18,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -30,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,6 +44,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import javax.swing.JPanel;
 import com.mysql.cj.xdevapi.Statement;
 import javax.swing.JTextPane;
@@ -45,6 +53,13 @@ import javax.swing.ListSelectionModel;
 
 
 public class Main {
+	
+	
+	//Images
+	
+	public static ArrayList<Image> bookSpines = new ArrayList<Image>();
+	public static ArrayList<Image> bookBacks = new ArrayList<Image>();
+	public static Image backgroundImage;
 	
 	
 	
@@ -65,7 +80,8 @@ public class Main {
 	
 
 	static JScrollPane scrollPane = new JScrollPane();
-	static JTextPane descriptionLabel = new JTextPane();
+	static CustomTextPane descriptionLabelImage = new CustomTextPane();
+	static JTextPane descriptionLabelText = new JTextPane();
 	static JButton newStoryButton = new JButton("New Story");
 	static JButton editStoryButton = new JButton("Edit Story");
 	
@@ -90,6 +106,7 @@ public class Main {
 			public void run() {
 				try {
 					Main window = new Main();
+					
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -113,26 +130,58 @@ public class Main {
 	 * @throws SQLException 
 	 */
 	private void initialize() throws SQLException {
+		
+		//set images
+		
+		int i = 1;
+		while(true) {
+			
+			try {
+				bookSpines.add(new ImageIcon(this.getClass().getResource("/Book Spine" + i +".png")).getImage());
+			}
+			catch(Exception e) {
+				
+				break;
+			}
+			i++;
+		}
+		
+		int x = 1;
+		while(true) {
+			
+			try {
+				bookBacks.add(new ImageIcon(this.getClass().getResource("/BookBack" + x +".png")).getImage());
+			}
+			catch(Exception e) {
+				
+				break;
+			}
+			x++;
+		}
+		
+		backgroundImage = new ImageIcon(this.getClass().getResource("/background.png")).getImage();
+		
+
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1023, 634);
+		frame.setBounds(100, 100, 1023, 672);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		frame.setMinimumSize(new Dimension(1023, 634));
-		
+		frame.setContentPane(new ImagePanel(backgroundImage));
 		
 		SetMainMenu(true);
 		
 
 		LoadStoriesFromDatabase();
 
-		scrollPane.setBounds(10, 86, 291, 498);
+		scrollPane.setBounds(80, 134, 245, 439);
 		frame.getContentPane().add(scrollPane);
 		
 		
-		scrollPane.setViewportView(panel);
-		panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 5));
-		panel.setBackground(new Color(211,211,211));
-		panel.setLayout(null);
+		//scrollPane.setViewportView(panel);
+		//panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 5));
+		//panel.setBackground(new Color(211,211,211));
+		//panel.setLayout(null);
 
 		newStoryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -146,10 +195,10 @@ public class Main {
 		});
 		
 		
-		newStoryButton.setBounds(10, 25, 291, 50);
+		newStoryButton.setBounds(111, 73, 183, 50);
 		frame.getContentPane().add(newStoryButton);
 
-		editStoryButton.setBounds(633, 542, 145, 50);
+		editStoryButton.setBounds(619, 523, 183, 50);
 		frame.getContentPane().add(editStoryButton);
 		editStoryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -161,9 +210,16 @@ public class Main {
 				}
 			}
 		});
+		editStoryButton.setVisible(false);
 
-		descriptionLabel.setBounds(413, 92, 571, 439);
-		frame.getContentPane().add(descriptionLabel);
+		descriptionLabelImage.setBounds(540, 92, 333, 420);
+		
+		descriptionLabelText.setBounds(580, 140, 250, 330);
+		descriptionLabelText.setOpaque(false);
+		frame.getContentPane().add(descriptionLabelText);
+		frame.getContentPane().add(descriptionLabelImage);
+		descriptionLabelImage.setVisible(false);
+		descriptionLabelText.setVisible(false);
 		
 		
 	}
@@ -216,8 +272,9 @@ public class Main {
 				}
 			});
 	
-			descriptionLabel.setBounds(413, 92, 571, 439);
-			frame.getContentPane().add(descriptionLabel);
+			
+			descriptionLabelImage.setBounds(413, 92, 571, 439);
+			frame.getContentPane().add(descriptionLabelImage);
 			
 			/*frame.addComponentListener(new ComponentAdapter() {
 				   public void componentResized(ComponentEvent componentEvent) {
@@ -225,8 +282,8 @@ public class Main {
 					   for(Component component : frame.getComponents()){
 						   
 					   
-						   descriptionLabel.setLocation(frame.getWidth()*1/4, frame.getHeight()*1/4);
-						   descriptionLabel.setSize(frame.getWidth()*1/2, frame.getHeight()*1/2);
+						   descriptionLabelImage.setLocation(frame.getWidth()*1/4, frame.getHeight()*1/4);
+						   descriptionLabelImage.setSize(frame.getWidth()*1/2, frame.getHeight()*1/2);
 					   }
 				   }
 					   
@@ -243,9 +300,11 @@ public class Main {
 				}
 				
 				scrollPane.setVisible(set);
-				descriptionLabel.setVisible(set);
+				descriptionLabelImage.setVisible(set);
 				newStoryButton.setVisible(set);
 				editStoryButton.setVisible(set);
+				descriptionLabelText.setVisible(false);
+				descriptionLabelImage.setVisible(false);
 				
 			}
 	}
@@ -403,8 +462,8 @@ public class Main {
 		
 		
 		
-		
-		descriptionLabel.setText("Date Created: " + date + " \r\n\r\n" + SearchDatabase("Synopsis", "Story", "ID", Integer.toString(key)));
+		descriptionLabelText.setContentType("text/html");
+		descriptionLabelText.setText("<html><center>" + SearchDatabase("Synopsis", "Story", "ID", Integer.toString(key)) + "<br><br>Date Created: " + date + "</center></html>");
 		//storyTitleLabel.setText(SearchDatabase("Title", "Story", "ID", Integer.toString(key + 1));
 		}
 		catch(Exception e) {
@@ -470,15 +529,31 @@ public class Main {
                 
                 final int key = resultSet.getInt(1);
                 
+                int randomNumber = ThreadLocalRandom.current().nextInt(1, bookSpines.size() + 1);
                 JButton storyButton = new JButton(resultSet.getString(2));
-        		storyButton.setBounds(10, 11 + (i * 60), 269, 43);
+        		storyButton.setBounds(10, 11 + (i * 40), 225, 43);
+        		
+        		
+        		System.out.println(randomNumber);
+        		
+        		storyButton.setIcon(new ImageIcon(bookSpines.get(randomNumber - 1)));
+        		storyButton.setHorizontalTextPosition(JButton.CENTER);
+        		storyButton.setVerticalTextPosition(JButton.CENTER);
         		
         		//When the button is clicked, show it's description and set the story currently being looked at or edited to that button
         		storyButton.addActionListener(new ActionListener() {
         			public void actionPerformed(ActionEvent e) {
         				
 							ShowDescription(key);
-
+							
+							//Show the description
+							editStoryButton.setVisible(true);
+							descriptionLabelText.setVisible(true);
+							descriptionLabelImage.setVisible(true);
+							descriptionLabelImage.SetImage(bookBacks.get(randomNumber - 1));
+							
+							
+							//set the current story
 							currentStory = SearchDatabase("Title", "Story", "ID", Integer.toString(key));
         			}
         		});
@@ -579,6 +654,51 @@ public class Main {
 	}
 	
 	
+	
+	//Custom components
+	
+	class ImagePanel extends JComponent {
+	    private Image image;
+	    public ImagePanel(Image image) {
+	        this.image = image;
+	    }
+	    @Override
+	    protected void paintComponent(Graphics g) {
+	        super.paintComponent(g);
+	        g.drawImage(image, 0, 0, this);
+	    }
+	}
+	
+	
+	
+	
+	public static class CustomTextPane extends JTextPane {
+		
+		 public CustomTextPane() {
+			    super();
+			    setOpaque(false);
+			    //setBackground(new Color(0, 0, 0, 0));
+			  }
+		 
+			 private Image img;
+			 
+			 public void SetImage(Image image) {
+				 img = image;
+				 repaint();
+			 }
+
+			  @Override
+			  protected void paintComponent(Graphics g) {
+			    //g.setColor(Color.GREEN);
+			    g.fillRect(0, 0, getWidth(), getHeight());
+
+			    // uncomment the following to draw an image
+			    
+			    g.drawImage(img, 0, 0, this);
+
+			    super.paintComponent(g);
+			  }
+	}
 	
 	
 }
