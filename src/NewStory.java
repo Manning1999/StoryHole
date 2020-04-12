@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
 import java.awt.Font;
 import javax.swing.JList;
 import javax.swing.JLabel;
@@ -38,8 +39,8 @@ public class NewStory {
 	private static JLabel genreLabel = new JLabel("Primary Genre");
 	private static TextArea synopsisTextArea = new TextArea();
 	private static JTextField authorTextField;
-	private static JButton backButton = new JButton("Back");
-	private static Button createStoryButton = new Button("Create Story");
+	private static Main.CustomButton backButton = new Main.CustomButton("Back");
+	private static Main.CustomButton createStoryButton = new Main.CustomButton("Create Story");
 	private static JLabel authorLabel = new JLabel("Author");
 	
 	static Boolean createdNewStoryMenu = false;
@@ -74,17 +75,22 @@ public class NewStory {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		Main.getInstance().SetImages();
+		
+		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1023, 634);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		frame.setContentPane(new Main.ImagePanel(Main.backgroundImage));
+		
 		
 		titleTextField = new JTextField();
 		titleTextField.setFont(new Font("Tahoma", Font.BOLD, 29));
 		titleTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		titleTextField.setText("Title");
 		titleTextField.setToolTipText("Title");
-		titleTextField.setBounds(356, 29, 262, 56);
+		titleTextField.setBounds(356, 50, 262, 56);
 		frame.getContentPane().add(titleTextField);
 		titleTextField.setColumns(10);
 		
@@ -97,13 +103,13 @@ public class NewStory {
 		
 		
 		
-		genreList.setBounds(40, 136, 135, 263);
+		genreList.setBounds(90, 136, 135, 263);
 		frame.getContentPane().add(genreList);
 		
 
 		genreLabel.setFont(new Font("Tahoma", Font.ITALIC, 18));
 		genreLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		genreLabel.setBounds(40, 89, 135, 37);
+		genreLabel.setBounds(80, 89, 135, 37);
 		frame.getContentPane().add(genreLabel);
 		
 
@@ -117,11 +123,13 @@ public class NewStory {
 		
 
 		createStoryButton.setFont(new Font("Dialog", Font.BOLD, 16));
-		createStoryButton.setBounds(370, 531, 135, 37);
+
+		createStoryButton.setBounds(370, 500, 135, 37);
+		createStoryButton.SetButtonVariation(1);
 		frame.getContentPane().add(createStoryButton);
 		
 		authorTextField = new JTextField();
-		authorTextField.setBounds(40, 473, 172, 37);
+		authorTextField.setBounds(80, 473, 172, 37);
 		frame.getContentPane().add(authorTextField);
 		authorTextField.setColumns(10);
 		
@@ -132,6 +140,7 @@ public class NewStory {
 		
 
 		backButton.setBounds(10, 11, 55, 23);
+		backButton.SetButtonVariation(1);
 		frame.getContentPane().add(backButton);
 	}
 	
@@ -181,6 +190,7 @@ public class NewStory {
 
 			createStoryButton.setFont(new Font("Dialog", Font.BOLD, 16));
 			createStoryButton.setBounds(370, 531, 135, 37);
+			createStoryButton.SetButtonVariation(1);
 			createStoryButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					
@@ -209,6 +219,7 @@ public class NewStory {
 			
 			
 			backButton.setBounds(10, 11, 89, 23);
+			backButton.SetButtonVariation(1);
 			backButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {

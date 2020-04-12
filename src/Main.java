@@ -40,6 +40,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -60,6 +61,10 @@ public class Main {
 	public static ArrayList<Image> bookSpines = new ArrayList<Image>();
 	public static ArrayList<Image> bookBacks = new ArrayList<Image>();
 	public static Image backgroundImage;
+	public static Image buttonSelectedImage;
+	public static Image buttonUnselectedImage;
+	public static Image buttonSelectedV2Image;
+	
 	
 	
 	
@@ -82,12 +87,14 @@ public class Main {
 	static JScrollPane scrollPane = new JScrollPane();
 	static CustomTextPane descriptionLabelImage = new CustomTextPane();
 	static JTextPane descriptionLabelText = new JTextPane();
-	static JButton newStoryButton = new JButton("New Story");
-	static JButton editStoryButton = new JButton("Edit Story");
+	static CustomButton newStoryButton = new CustomButton("New Story");
+	static CustomButton editStoryButton = new CustomButton("Edit Story");
+	
+	
 	
 
-	 static Connection connection = null;
-     static java.sql.Statement statement = null;
+	static Connection connection = null;
+    static java.sql.Statement statement = null;
 	
 	static ResultSet resultSet = null;
 	
@@ -97,6 +104,14 @@ public class Main {
 
 
 	Boolean storyMenuIsCreated = false;
+	
+	
+	//These variables are used for scaling everything
+	float scaleFactorX = 1;
+	float scaleFactorY = 1;
+	float originalXSize;
+	float originalYSize;
+	
 
 	/**
 	 * Launch the application.
@@ -105,7 +120,7 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main window = new Main();
+					Main window = new Main(true);
 					
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -119,25 +134,38 @@ public class Main {
 	 * Create the application.
 	 * @throws SQLException 
 	 */
-	public Main() throws SQLException {
-		initialize();
+	public Main(Boolean isInitializing) throws SQLException {
+		
+		if(isInitializing == true) {
+			SetImages();
+			initialize();
+			
+		}
 		
 		 
 	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 * @throws SQLException 
-	 */
-	private void initialize() throws SQLException {
-		
-		//set images
-		
+	
+	private static Main instance = null; 
+	// static method to create instance of Singleton class 
+    public static Main getInstance() 
+    { 
+        if (instance == null)
+			try {
+				instance = new Main(false);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+  
+        return instance; 
+    } 
+	
+	public void SetImages() {
 		int i = 1;
 		while(true) {
 			
 			try {
-				bookSpines.add(new ImageIcon(this.getClass().getResource("/Book Spine" + i +".png")).getImage());
+				bookSpines.add(new ImageIcon(getClass().getResource("/Book Spine" + i +".png")).getImage());
 			}
 			catch(Exception e) {
 				
@@ -150,7 +178,7 @@ public class Main {
 		while(true) {
 			
 			try {
-				bookBacks.add(new ImageIcon(this.getClass().getResource("/BookBack" + x +".png")).getImage());
+				bookBacks.add(new ImageIcon(getClass().getResource("/BookBack" + x +".png")).getImage());
 			}
 			catch(Exception e) {
 				
@@ -159,7 +187,21 @@ public class Main {
 			x++;
 		}
 		
-		backgroundImage = new ImageIcon(this.getClass().getResource("/background.png")).getImage();
+		backgroundImage = new ImageIcon(getClass().getResource("/background.png")).getImage();
+		buttonSelectedImage = new ImageIcon(getClass().getResource("/ButtonSelected.png")).getImage();
+		buttonSelectedV2Image = new ImageIcon(getClass().getResource("/ButtonSelectedV2.png")).getImage();
+		buttonUnselectedImage = new ImageIcon(getClass().getResource("/ButtonUnselected.png")).getImage();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 * @throws SQLException 
+	 */
+	public void initialize() throws SQLException {
+		
+		//set images
+		
+		
 		
 
 		frame = new JFrame();
@@ -167,22 +209,49 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		frame.setMinimumSize(new Dimension(1023, 634));
-		frame.setContentPane(new ImagePanel(backgroundImage));
+		ImagePanel backgroundPanel = new ImagePanel(backgroundImage);
+		frame.setContentPane(backgroundPanel);
+		originalXSize = frame.getWidth();
+		originalYSize = frame.getHeight();
+		
+		frame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+            	
+            	backgroundPanel.SetImage(backgroundImage);
+            	scaleFactorX = frame.getWidth() / originalXSize;
+            	
+            	ResizeAllComponents();
+            	
+            }
+        });
+		
+		
 		
 		SetMainMenu(true);
 		
 
 		LoadStoriesFromDatabase();
 
-		scrollPane.setBounds(80, 134, 245, 439);
+		scrollPane.setBounds(Math.round(80 * scaleFactorX), Math.round(134 * scaleFactorY), Math.round(245 * scaleFactorX), Math.round(439 * scaleFactorY));
+		
+		scrollPane.setOpaque(false);
+	
+	//	scrollPane.SetImage(buttonSelectedImage);
 		frame.getContentPane().add(scrollPane);
 		
 		
-		//scrollPane.setViewportView(panel);
-		//panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 5));
-		//panel.setBackground(new Color(211,211,211));
-		//panel.setLayout(null);
+		scrollPane.setViewportView(panel);
+		
+		
+		//panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220, 0), 5));
+		panel.setBackground(new Color(211,211,211, 0));
+		
+		//Image backgroundImage = backgroundImage.getScaledInstance(frame.getWidth(), frame.getHeight(), Image.SCALE_SMOOTH);
+		
+		//panel.SetImage(backgroundImage);
+		panel.setLayout(null);
 
+		
 		newStoryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -194,8 +263,12 @@ public class Main {
 			}
 		});
 		
-		
-		newStoryButton.setBounds(111, 73, 183, 50);
+		newStoryButton.setBounds(Math.round(111 * scaleFactorX), Math.round(73 * scaleFactorY), Math.round(183 * scaleFactorX), Math.round(50 * scaleFactorY));
+		newStoryButton.SetButtonVariation(1);
+		newStoryButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		newStoryButton.setOpaque(false);
+		newStoryButton.setContentAreaFilled(false);
+		newStoryButton.setBorderPainted(false);
 		frame.getContentPane().add(newStoryButton);
 
 		editStoryButton.setBounds(619, 523, 183, 50);
@@ -210,6 +283,10 @@ public class Main {
 				}
 			}
 		});
+		editStoryButton.SetButtonVariation(1);
+		editStoryButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		editStoryButton.setContentAreaFilled(false);
+		editStoryButton.setBorderPainted(false);
 		editStoryButton.setVisible(false);
 
 		descriptionLabelImage.setBounds(540, 92, 333, 420);
@@ -230,7 +307,7 @@ public class Main {
 	public static void SetMainMenu(Boolean set) throws SQLException {
 		
 		
-		if(mainMenuIsCreated == false) {
+		if(mainMenuIsCreated == false && set == true) {
 			
 			mainMenuIsCreated = true;
 			
@@ -240,8 +317,8 @@ public class Main {
 			
 			
 			scrollPane.setViewportView(panel);
-			panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220), 5));
-			panel.setBackground(new Color(211,211,211));
+			//panel.setBorder(BorderFactory.createLineBorder(new Color(220,220,220, 0), 5));
+			panel.setBackground(new Color(211,211,211, 0));
 			panel.setLayout(null);
 	
 			newStoryButton.addActionListener(new ActionListener() {
@@ -292,6 +369,7 @@ public class Main {
 			}
 			else {
 				
+				try {
 				if(set==true) {
 					NewStory.SetNewStoryMenu(false);
 					CharacterPlanningMenu.SetCharacterMenu(false);
@@ -305,11 +383,18 @@ public class Main {
 				editStoryButton.setVisible(set);
 				descriptionLabelText.setVisible(false);
 				descriptionLabelImage.setVisible(false);
-				
+				}
+				catch(Exception e) {
+					System.out.println("Menu probably hasn't been created yet");
+				}
 			}
 	}
 	
 	
+	
+	public void ResizeAllComponents() {
+		newStoryButton.setBounds(Math.round(111 * scaleFactorX), Math.round(73 * scaleFactorY), Math.round(183 * scaleFactorX), Math.round(50 * scaleFactorY));
+	}
 	
 	
 	
@@ -472,6 +557,14 @@ public class Main {
 		
 		
 	}
+	
+	
+	
+	
+	
+	
+	
+
 	
 	
 	private static void LoadStoriesFromDatabase() {
@@ -653,15 +746,47 @@ public class Main {
 		
 	}
 	
+	Boolean isRunning = false;
+	public void WaitForFrameChange() {
+		
+		/*if(isRunning == false) {
+			isRunning = true;
+			oldXSize = frame.getWidth();
+	    	oldYSize = frame.getHeight();
+	    	
+				int delay = 10; //milliseconds
+				Timer timer = new Timer(delay, null);
+				  timer.addActionListener(new ActionListener() {
+				      public void actionPerformed(ActionEvent evt) {
+				    	  
+				          scaleFactorX = frame.getWidth() / oldXSize;
+				          if(scaleFactorX != 1.0) System.out.println("Scale Factor: " + scaleFactorX + "   formula: " + oldXSize + " - " + frame.getWidth());
+				          isRunning = false;
+				          timer.stop();
+				      }
+				  });
+				  timer.start();
+		}*/
+		  
+	}
+	  
+	
 	
 	
 	//Custom components
 	
-	class ImagePanel extends JComponent {
+	public static class ImagePanel extends JComponent {
 	    private Image image;
 	    public ImagePanel(Image image) {
 	        this.image = image;
+	        
 	    }
+	    
+	    public void SetImage(Image img) {
+	    	image = img.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH);
+	    	repaint();
+	    }
+	    
 	    @Override
 	    protected void paintComponent(Graphics g) {
 	        super.paintComponent(g);
@@ -683,7 +808,7 @@ public class Main {
 			 private Image img;
 			 
 			 public void SetImage(Image image) {
-				 img = image;
+				 img = image.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH);
 				 repaint();
 			 }
 
@@ -698,6 +823,118 @@ public class Main {
 
 			    super.paintComponent(g);
 			  }
+	}
+	
+	
+	public static class CustomScrollPane extends JTextPane {
+		
+		 public CustomScrollPane() {
+			    super();
+			    setOpaque(false);
+			    //setBackground(new Color(0, 0, 0, 0));
+			  }
+		 
+			 private Image img;
+			 
+			 public void SetImage(Image image) {
+				 img = image.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH);;
+				 repaint();
+				 
+			 }
+
+			  @Override
+			  protected void paintComponent(Graphics g) {
+			    //g.setColor(Color.GREEN);
+			    g.fillRect(0, 0, getWidth(), getHeight());
+
+			    // uncomment the following to draw an image
+			    
+			    g.drawImage(img, 0, 0, this);
+
+			    super.paintComponent(g);
+			  }
+	}
+	
+	
+	public static class CustomPanel extends JPanel {
+		
+		public CustomPanel() {
+			super();
+			setOpaque(false);
+		}
+			
+			private Image img;
+			
+			public void SetImage(Image image) {
+				img = image.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH);;
+				
+				repaint();
+			}
+			
+			protected void paintComponent(Graphics g) {
+				g.fillRect(0,0,getWidth(), getHeight());
+				
+				g.drawImage(img, 0,0, this);
+				super.paintComponent(g);
+		}
+		
+	}
+	
+	
+	
+	public static class CustomButton extends JButton {
+		
+		Image img;
+		
+		public CustomButton(String text) {
+			setText(text);
+		}
+		
+		public void SetButtonVariation(int i) {
+			
+			if(i == 0) {
+				img = buttonUnselectedImage;
+				img = img.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH);
+				setHorizontalTextPosition(SwingConstants.CENTER);
+				setOpaque(false);
+				setContentAreaFilled(false);
+				setBorderPainted(false);
+				setIcon(new ImageIcon(img));
+				
+				addMouseListener(new java.awt.event.MouseAdapter() {
+				    public void mouseEntered(java.awt.event.MouseEvent evt) {
+						setIcon(new ImageIcon(buttonSelectedImage));
+				    }
+
+				    public void mouseExited(java.awt.event.MouseEvent evt) {
+				        setIcon(new ImageIcon(buttonUnselectedImage));
+				    }
+				});
+			}
+			
+			if(i == 1) {
+				img = buttonUnselectedImage;
+				setHorizontalTextPosition(SwingConstants.CENTER);
+				setVerticalTextPosition(SwingConstants.CENTER);
+				setOpaque(false);
+				setContentAreaFilled(false);
+				setBorderPainted(false);
+				setIcon(new ImageIcon(img.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH)));
+				
+				addMouseListener(new java.awt.event.MouseAdapter() {
+				    public void mouseEntered(java.awt.event.MouseEvent evt) {
+						setIcon(new ImageIcon(buttonSelectedV2Image.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH)));
+				    }
+
+				    public void mouseExited(java.awt.event.MouseEvent evt) {
+				        setIcon(new ImageIcon(buttonUnselectedImage.getScaledInstance(getWidth(), getHeight(), java.awt.Image.SCALE_SMOOTH)));
+				    }
+				});
+			}
+		}
+		
+		
+		
 	}
 	
 	
